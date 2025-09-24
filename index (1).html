@@ -1,696 +1,731 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ketupat Weaving Game</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #8BC34A 0%, #4CAF50 100%);
-      color: #1B5E20;
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .container {
-      width: 100%;
-      max-width: 900px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      padding: 25px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    }
-    
-    header {
-      text-align: center;
-      margin-bottom: 25px;
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      color: #2E7D32;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    .subtitle {
-      font-size: 1.1rem;
-      color: #388E3C;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    
-    .game-container {
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-    }
-    
-    @media (min-width: 768px) {
-      .game-container {
-        flex-direction: row;
-        justify-content: space-between;
-      }
-    }
-    
-    .game-panel {
-      flex: 1;
-      background: #F1F8E9;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    .panel-title {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.4rem;
-      color: #2E7D32;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    .grid-container {
-      display: flex;
-      justify-content: center;
-    }
-    
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 8px;
-      background: #C5E1A5;
-      padding: 15px;
-      border-radius: 12px;
-      margin: 0 auto;
-      max-width: 300px;
-    }
-    
-    .cell {
-      width: 80px;
-      height: 80px;
-      background: #E8F5E9;
-      border: 2px solid #81C784;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-    
-    .cell.highlight {
-      background: #DCEDC8;
-      border-color: #4CAF50;
-    }
-    
-    .strip {
-      width: 70px;
-      height: 70px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    .green {
-      background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
-      color: white;
-    }
-    
-    .white {
-      background: linear-gradient(135deg, #FFFFFF 0%, #EEEEEE 100%);
-      color: #9E9E9E;
-      border: 1px solid #BDBDBD;
-    }
-    
-    #strips {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin: 25px 0;
-    }
-    
-    .draggable-strip {
-      width: 80px;
-      height: 80px;
-      border-radius: 10px;
-      cursor: grab;
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      transition: all 0.3s ease;
-    }
-    
-    .draggable-strip:active {
-      cursor: grabbing;
-      transform: scale(0.95);
-    }
-    
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin: 20px 0;
-    }
-    
-    button {
-      padding: 14px 20px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
-      color: white;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-    }
-    
-    button:active {
-      transform: translateY(0);
-    }
-    
-    #reset {
-      background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
-    }
-    
-    #message {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      text-align: center;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      background: #E8F5E9;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    #message.show {
-      opacity: 1;
-    }
-    
-    .success {
-      color: #2E7D32;
-      background: #C8E6C9 !important;
-    }
-    
-    .error {
-      color: #D32F2F;
-      background: #FFCDD2 !important;
-    }
-    
-    .instructions {
-      background: #E8F5E9;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 25px;
-    }
-    
-    .instructions h3 {
-      margin-bottom: 15px;
-      color: #2E7D32;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    .instructions ol {
-      text-align: left;
-      padding-left: 20px;
-      line-height: 1.6;
-    }
-    
-    .instructions li {
-      margin-bottom: 10px;
-    }
-    
-    .score {
-      font-size: 1.2rem;
-      margin-top: 15px;
-      font-weight: bold;
-      color: #2E7D32;
-      text-align: center;
-    }
-    
-    .share-section {
-      margin-top: 30px;
-      text-align: center;
-      padding: 20px;
-      background: #E8F5E9;
-      border-radius: 12px;
-    }
-    
-    .share-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 15px;
-    }
-    
-    .share-btn {
-      padding: 12px 20px;
-      border-radius: 50px;
-      background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
-      color: white;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Mobile-specific styles */
-    @media (max-width: 767px) {
-      h1 {
-        font-size: 2rem;
-      }
-      
-      .subtitle {
-        font-size: 1rem;
-      }
-      
-      .grid {
-        max-width: 250px;
-      }
-      
-      .cell {
-        width: 70px;
-        height: 70px;
-      }
-      
-      .strip {
-        width: 60px;
-        height: 60px;
-      }
-      
-      .draggable-strip {
-        width: 70px;
-        height: 70px;
-      }
-      
-      .share-buttons {
-        flex-direction: column;
-        align-items: center;
-      }
-    }
-    
-    /* Animation for strips */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    
-    .draggable-strip.pulse {
-      animation: pulse 1s infinite;
-    }
-    
-    /* Celebration animation */
-    @keyframes celebrate {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-    
-    .celebrate {
-      animation: celebrate 0.5s ease-in-out 3;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketupat Weaving Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #8BC34A 0%, #4CAF50 100%);
+            color: #1B5E20;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2E7D32;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #388E3C;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .game-container {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+        
+        .game-panel {
+            flex: 1;
+            background: #F1F8E9;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .panel-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            color: #2E7D32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .grid-container {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 8px;
+            background: #C5E1A5;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 0 auto;
+            max-width: 300px;
+        }
+        
+        .cell {
+            width: 80px;
+            height: 80px;
+            background: #E8F5E9;
+            border: 2px solid #81C784;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .cell.highlight {
+            background: #DCEDC8;
+            border-color: #4CAF50;
+        }
+        
+        .strip {
+            width: 70px;
+            height: 70px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .green {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+        }
+        
+        .white {
+            background: linear-gradient(135deg, #FFFFFF 0%, #EEEEEE 100%);
+            color: #9E9E9E;
+            border: 1px solid #BDBDBD;
+        }
+        
+        #strips {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .draggable-strip {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            cursor: grab;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transition: all 0.3s ease;
+        }
+        
+        .draggable-strip:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #reset {
+            background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
+        }
+        
+        #message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: #E8F5E9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        #message.show {
+            opacity: 1;
+        }
+        
+        .success {
+            color: #2E7D32;
+            background: #C8E6C9 !important;
+        }
+        
+        .error {
+            color: #D32F2F;
+            background: #FFCDD2 !important;
+        }
+        
+        .instructions {
+            background: #E8F5E9;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #2E7D32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .instructions ol {
+            text-align: left;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .score {
+            font-size: 1.2rem;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #2E7D32;
+            text-align: center;
+        }
+        
+        .share-section {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background: #E8F5E9;
+            border-radius: 12px;
+        }
+        
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .share-btn {
+            padding: 12px 20px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 767px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .grid {
+                max-width: 250px;
+            }
+            
+            .cell {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .strip {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .draggable-strip {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .share-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        /* Animation for strips */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .draggable-strip.pulse {
+            animation: pulse 1s infinite;
+        }
+        
+        /* Celebration animation */
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .celebrate {
+            animation: celebrate 0.5s ease-in-out 3;
+        }
+        
+        .github-section {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background: #E8F5E9;
+            border-radius: 12px;
+        }
+        
+        .github-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1><i class="fas fa-th-large"></i> Ketupat Weaving Game</h1>
-      <p class="subtitle">Drag and drop strips into the grid to match the ketupat sample pattern</p>
-    </header>
-    
-    <div class="game-container">
-      <div class="game-panel">
-        <h2 class="panel-title"><i class="fas fa-puzzle-piece"></i> Your Weaving</h2>
-        <div class="grid-container">
-          <div id="gameArea" class="grid"></div>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-th-large"></i> Ketupat Weaving Game</h1>
+            <p class="subtitle">Drag and drop strips into the grid to match the ketupat sample pattern</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="game-panel">
+                <h2 class="panel-title"><i class="fas fa-puzzle-piece"></i> Your Weaving</h2>
+                <div class="grid-container">
+                    <div id="gameArea" class="grid"></div>
+                </div>
+                
+                <div id="strips">
+                    <div class="draggable-strip green" draggable="true"><i class="fas fa-leaf"></i></div>
+                    <div class="draggable-strip white" draggable="true"><i class="fas fa-stroopwafel"></i></div>
+                </div>
+                
+                <div class="controls">
+                    <button id="check"><i class="fas fa-check-circle"></i> Check Solution</button>
+                    <button id="reset"><i class="fas fa-redo"></i> Reset Game</button>
+                </div>
+                
+                <div id="message"></div>
+                <div class="score">Moves: <span id="moveCount">0</span></div>
+            </div>
+            
+            <div class="game-panel">
+                <h2 class="panel-title"><i class="fas fa-eye"></i> Sample Pattern</h2>
+                <div class="grid-container">
+                    <div id="sampleArea" class="grid"></div>
+                </div>
+                <div class="instructions">
+                    <h3><i class="fas fa-info-circle"></i> How to Play</h3>
+                    <ol>
+                        <li>Drag green and white strips onto the grid on the left</li>
+                        <li>Try to recreate the pattern shown in the sample</li>
+                        <li>Click "Check Solution" to verify your pattern</li>
+                        <li>Reset the game at any time to start over</li>
+                    </ol>
+                </div>
+            </div>
         </div>
         
-        <div id="strips">
-          <div class="draggable-strip green" draggable="true"><i class="fas fa-leaf"></i></div>
-          <div class="draggable-strip white" draggable="true"><i class="fas fa-stroopwafel"></i></div>
+        <div class="share-section">
+            <h3><i class="fas fa-share-alt"></i> Share this Game</h3>
+            <p>Challenge your friends to complete the ketupat weaving pattern!</p>
+            <div class="share-buttons">
+                <a href="#" class="share-btn" id="whatsapp-share"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                <a href="#" class="share-btn" id="telegram-share"><i class="fab fa-telegram"></i> Telegram</a>
+                <a href="#" class="share-btn" id="copy-link"><i class="fas fa-link"></i> Copy Link</a>
+            </div>
         </div>
         
-        <div class="controls">
-          <button id="check"><i class="fas fa-check-circle"></i> Check Solution</button>
-          <button id="reset"><i class="fas fa-redo"></i> Reset Game</button>
+        <div class="github-section">
+            <h3><i class="fab fa-github"></i> Host on GitHub</h3>
+            <p>Follow these steps to host this game on GitHub Pages:</p>
+            <ol style="text-align: left; max-width: 600px; margin: 15px auto;">
+                <li>Create a new repository on GitHub</li>
+                <li>Upload this HTML file and name it <code>index.html</code></li>
+                <li>Go to Settings → Pages → Select "main" branch → Save</li>
+                <li>Your game will be live at: <code>https://username.github.io/repository-name</code></li>
+            </ol>
+            <a href="https://github.com" target="_blank" class="github-btn">
+                <i class="fab fa-github"></i> Go to GitHub
+            </a>
         </div>
-        
-        <div id="message"></div>
-        <div class="score">Moves: <span id="moveCount">0</span></div>
-      </div>
-      
-      <div class="game-panel">
-        <h2 class="panel-title"><i class="fas fa-eye"></i> Sample Pattern</h2>
-        <div class="grid-container">
-          <div id="sampleArea" class="grid"></div>
-        </div>
-        <div class="instructions">
-          <h3><i class="fas fa-info-circle"></i> How to Play</h3>
-          <ol>
-            <li>Drag green and white strips onto the grid on the left</li>
-            <li>Try to recreate the pattern shown in the sample</li>
-            <li>Click "Check Solution" to verify your pattern</li>
-            <li>Reset the game at any time to start over</li>
-          </ol>
-        </div>
-      </div>
     </div>
-    
-    <div class="share-section">
-      <h3><i class="fas fa-share-alt"></i> Share this Game</h3>
-      <p>Challenge your friends to complete the ketupat weaving pattern!</p>
-      <div class="share-buttons">
-        <a href="#" class="share-btn" id="whatsapp-share"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-        <a href="#" class="share-btn" id="telegram-share"><i class="fab fa-telegram"></i> Telegram</a>
-        <a href="#" class="share-btn" id="copy-link"><i class="fas fa-link"></i> Copy Link</a>
-      </div>
-    </div>
-  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const gameArea = document.getElementById("gameArea");
-      const sampleArea = document.getElementById("sampleArea");
-      const message = document.getElementById("message");
-      const checkBtn = document.getElementById("check");
-      const resetBtn = document.getElementById("reset");
-      const moveCountElement = document.getElementById("moveCount");
-      
-      let moveCount = 0;
-      let gameCompleted = false;
-      let currentDraggedElement = null;
-      
-      // Initialize the game
-      function initGame() {
-        // Clear existing cells
-        gameArea.innerHTML = '';
-        sampleArea.innerHTML = '';
-        message.textContent = '';
-        message.className = '';
-        moveCount = 0;
-        moveCountElement.textContent = moveCount;
-        gameCompleted = false;
-        
-        // Create 3x3 puzzle cells
-        for (let i = 0; i < 9; i++) {
-          const cell = document.createElement("div");
-          cell.classList.add("cell");
-          cell.dataset.index = i;
-          cell.addEventListener("dragover", dragOver);
-          cell.addEventListener("dragenter", dragEnter);
-          cell.addEventListener("dragleave", dragLeave);
-          cell.addEventListener("drop", drop);
-          
-          // Add touch events for mobile
-          cell.addEventListener("touchstart", cellTouchStart, {passive: false});
-          cell.addEventListener("touchmove", cellTouchMove, {passive: false});
-          cell.addEventListener("touchend", cellTouchEnd);
-          
-          gameArea.appendChild(cell);
-        }
-        
-        // Create 3x3 sample ketupat pattern
-        for (let i = 0; i < 9; i++) {
-          const sampleCell = document.createElement("div");
-          sampleCell.classList.add("cell");
-          const color = (Math.floor(i / 3) + i % 3) % 2 === 0 ? "green" : "white";
-          const strip = document.createElement("div");
-          strip.classList.add("strip", color);
-          if (color === "green") {
-            strip.innerHTML = '<i class="fas fa-leaf"></i>';
-          } else {
-            strip.innerHTML = '<i class="fas fa-stroopwafel"></i>';
-          }
-          sampleCell.appendChild(strip);
-          sampleArea.appendChild(sampleCell);
-        }
-        
-        // Make strips draggable
-        const strips = document.querySelectorAll(".draggable-strip");
-        strips.forEach(strip => {
-          strip.addEventListener("dragstart", dragStart);
-          
-          // Add touch events for mobile
-          strip.addEventListener("touchstart", stripTouchStart, {passive: false});
-          strip.addEventListener("touchmove", stripTouchMove, {passive: false});
-          strip.addEventListener("touchend", stripTouchEnd);
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gameArea = document.getElementById("gameArea");
+            const sampleArea = document.getElementById("sampleArea");
+            const message = document.getElementById("message");
+            const checkBtn = document.getElementById("check");
+            const resetBtn = document.getElementById("reset");
+            const moveCountElement = document.getElementById("moveCount");
+            
+            let moveCount = 0;
+            let gameCompleted = false;
+            let currentDraggedElement = null;
+            
+            // Initialize the game
+            function initGame() {
+                // Clear existing cells
+                gameArea.innerHTML = '';
+                sampleArea.innerHTML = '';
+                message.textContent = '';
+                message.className = '';
+                moveCount = 0;
+                moveCountElement.textContent = moveCount;
+                gameCompleted = false;
+                
+                // Create 3x3 puzzle cells
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    cell.dataset.index = i;
+                    cell.addEventListener("dragover", dragOver);
+                    cell.addEventListener("dragenter", dragEnter);
+                    cell.addEventListener("dragleave", dragLeave);
+                    cell.addEventListener("drop", drop);
+                    
+                    // Add touch events for mobile
+                    cell.addEventListener("touchstart", cellTouchStart, {passive: false});
+                    cell.addEventListener("touchmove", cellTouchMove, {passive: false});
+                    cell.addEventListener("touchend", cellTouchEnd);
+                    
+                    gameArea.appendChild(cell);
+                }
+                
+                // Create 3x3 sample ketupat pattern
+                for (let i = 0; i < 9; i++) {
+                    const sampleCell = document.createElement("div");
+                    sampleCell.classList.add("cell");
+                    const color = (Math.floor(i / 3) + i % 3) % 2 === 0 ? "green" : "white";
+                    const strip = document.createElement("div");
+                    strip.classList.add("strip", color);
+                    if (color === "green") {
+                        strip.innerHTML = '<i class="fas fa-leaf"></i>';
+                    } else {
+                        strip.innerHTML = '<i class="fas fa-stroopwafel"></i>';
+                    }
+                    sampleCell.appendChild(strip);
+                    sampleArea.appendChild(sampleCell);
+                }
+                
+                // Make strips draggable
+                const strips = document.querySelectorAll(".draggable-strip");
+                strips.forEach(strip => {
+                    strip.addEventListener("dragstart", dragStart);
+                    
+                    // Add touch events for mobile
+                    strip.addEventListener("touchstart", stripTouchStart, {passive: false});
+                    strip.addEventListener("touchmove", stripTouchMove, {passive: false});
+                    strip.addEventListener("touchend", stripTouchEnd);
+                });
+            }
+            
+            // Drag and drop functions
+            function dragStart(e) {
+                e.dataTransfer.setData("text/plain", e.target.classList.contains("green") ? "green" : "white");
+                e.target.classList.add('pulse');
+                currentDraggedElement = e.target;
+            }
+            
+            function dragOver(e) {
+                e.preventDefault();
+            }
+            
+            function dragEnter(e) {
+                e.preventDefault();
+                if (e.target.classList.contains("cell") && !e.target.hasChildNodes()) {
+                    e.target.classList.add("highlight");
+                }
+            }
+            
+            function dragLeave(e) {
+                if (e.target.classList.contains("cell")) {
+                    e.target.classList.remove("highlight");
+                }
+            }
+            
+            function drop(e) {
+                e.preventDefault();
+                if (gameCompleted) return;
+                
+                if (e.target.classList.contains("cell")) {
+                    e.target.classList.remove("highlight");
+                    
+                    // Only allow one strip per cell
+                    if (e.target.hasChildNodes()) return;
+                    
+                    const color = e.dataTransfer.getData("text/plain");
+                    const newStrip = document.createElement("div");
+                    newStrip.classList.add("strip", color);
+                    
+                    if (color === "green") {
+                        newStrip.innerHTML = '<i class="fas fa-leaf"></i>';
+                    } else {
+                        newStrip.innerHTML = '<i class="fas fa-stroopwafel"></i>';
+                    }
+                    
+                    e.target.appendChild(newStrip);
+                    incrementMoveCount();
+                    checkWin(); // Auto-check after each move
+                }
+                
+                if (currentDraggedElement) {
+                    currentDraggedElement.classList.remove('pulse');
+                    currentDraggedElement = null;
+                }
+            }
+            
+            // Touch events for mobile
+            let touchStartX, touchStartY;
+            let draggedStrip = null;
+            
+            function stripTouchStart(e) {
+                const touch = e.touches[0];
+                touchStartX = touch.clientX;
+                touchStartY = touch.clientY;
+                
+                draggedStrip = e.target.cloneNode(true);
+                draggedStrip.style.position = 'fixed';
+                draggedStrip.style.zIndex = '1000';
+                draggedStrip.style.width = e.target.offsetWidth + 'px';
+                draggedStrip.style.height = e.target.offsetHeight + 'px';
+                draggedStrip.style.left = (touch.pageX - draggedStrip.offsetWidth / 2) + 'px';
+                draggedStrip.style.top = (touch.pageY - draggedStrip.offsetHeight / 2) + 'px';
+                document.body.appendChild(draggedStrip);
+                
+                e.target.classList.add('pulse');
+                e.preventDefault();
+            }
+            
+            function stripTouchMove(e) {
+                if (!draggedStrip) return;
+                const touch = e.touches[0];
+                draggedStrip.style.left = (touch.pageX - draggedStrip.offsetWidth / 2) + 'px';
+                draggedStrip.style.top = (touch.pageY - draggedStrip.offsetHeight / 2) + 'px';
+                
+                // Highlight potential drop target
+                const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+                const cell = elements.find(el => el.classList.contains('cell'));
+                
+                document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight'));
+                if (cell && !cell.hasChildNodes()) {
+                    cell.classList.add('highlight');
+                }
+                
+                e.preventDefault();
+            }
+            
+            function stripTouchEnd(e) {
+                if (!draggedStrip) return;
+                
+                const touch = e.changedTouches[0];
+                const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+                const cell = elements.find(el => el.classList.contains('cell'));
+                
+                if (cell && !cell.hasChildNodes()) {
+                    const color = draggedStrip.classList.contains("green") ? "green" : "white";
+                    const newStrip = document.createElement("div");
+                    newStrip.classList.add("strip", color);
+                    
+                    if (color === "green") {
+                        newStrip.innerHTML = '<i class="fas fa-leaf"></i>';
+                    } else {
+                        newStrip.innerHTML = '<i class="fas fa-stroopwafel"></i>';
+                    }
+                    
+                    cell.appendChild(newStrip);
+                    incrementMoveCount();
+                    checkWin(); // Auto-check after each move
+                }
+                
+                document.body.removeChild(draggedStrip);
+                draggedStrip = null;
+                
+                // Remove pulse animation and highlight
+                document.querySelectorAll('.draggable-strip').forEach(s => s.classList.remove('pulse'));
+                document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight'));
+                
+                e.preventDefault();
+            }
+            
+            function cellTouchStart(e) {
+                // Prevent default to prevent scrolling
+                e.preventDefault();
+            }
+            
+            function cellTouchMove(e) {
+                // Prevent default to prevent scrolling
+                e.preventDefault();
+            }
+            
+            function cellTouchEnd(e) {
+                // Prevent default to prevent scrolling
+                e.preventDefault();
+            }
+            
+            // Game functions
+            function incrementMoveCount() {
+                moveCount++;
+                moveCountElement.textContent = moveCount;
+            }
+            
+            function checkWin() {
+                const cells = document.querySelectorAll("#gameArea .cell");
+                
+                // Check if all cells are filled
+                const allFilled = [...cells].every(cell => cell.hasChildNodes());
+                if (!allFilled) return;
+                
+                let correct = true;
+                cells.forEach((cell, i) => {
+                    const expectedColor = (Math.floor(i / 3) + i % 3) % 2 === 0 ? "green" : "white";
+                    const actualColor = cell.firstChild.classList.contains("green") ? "green" : "white";
+                    
+                    if (actualColor !== expectedColor) {
+                        correct = false;
+                    }
+                });
+                
+                if (correct) {
+                    showMessage("✅ Well done! You've woven a perfect ketupat!", "success");
+                    gameCompleted = true;
+                    
+                    // Celebration animation
+                    cells.forEach(cell => {
+                        cell.firstChild.classList.add("celebrate");
+                    });
+                } else {
+                    showMessage("❌ Not quite right. Keep trying!", "error");
+                }
+            }
+            
+            function showMessage(text, type) {
+                message.textContent = text;
+                message.classList.add("show", type);
+                
+                // Auto-hide message after 3 seconds
+                setTimeout(() => {
+                    message.classList.remove("show");
+                }, 3000);
+            }
+            
+            function resetGame() {
+                initGame();
+            }
+            
+            // Share functions
+            document.getElementById('whatsapp-share').addEventListener('click', function() {
+                const text = "Check out this fun Ketupat Weaving Game!";
+                const url = window.location.href;
+                window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+            });
+            
+            document.getElementById('telegram-share').addEventListener('click', function() {
+                const text = "Check out this fun Ketupat Weaving Game!";
+                const url = window.location.href;
+                window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+            });
+            
+            document.getElementById('copy-link').addEventListener('click', function() {
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Link copied to clipboard!');
+                });
+            });
+            
+            // Event listeners
+            checkBtn.addEventListener("click", checkWin);
+            resetBtn.addEventListener("click", resetGame);
+            
+            // Initialize the game
+            initGame();
         });
-      }
-      
-      // Drag and drop functions
-      function dragStart(e) {
-        e.dataTransfer.setData("text/plain", e.target.classList.contains("green") ? "green" : "white");
-        e.target.classList.add('pulse');
-        currentDraggedElement = e.target;
-      }
-      
-      function dragOver(e) {
-        e.preventDefault();
-      }
-      
-      function dragEnter(e) {
-        e.preventDefault();
-        if (e.target.classList.contains("cell") && !e.target.hasChildNodes()) {
-          e.target.classList.add("highlight");
-        }
-      }
-      
-      function dragLeave(e) {
-        if (e.target.classList.contains("cell")) {
-          e.target.classList.remove("highlight");
-        }
-      }
-      
-      function drop(e) {
-        e.preventDefault();
-        if (gameCompleted) return;
-        
-        if (e.target.classList.contains("cell")) {
-          e.target.classList.remove("highlight");
-          
-          // Only allow one strip per cell
-          if (e.target.hasChildNodes()) return;
-          
-          const color = e.dataTransfer.getData("text/plain");
-          const newStrip = document.createElement("div");
-          newStrip.classList.add("strip", color);
-          
-          if (color === "green") {
-            newStrip.innerHTML = '<i class="fas fa-leaf"></i>';
-          } else {
-            newStrip.innerHTML = '<i class="fas fa-stroopwafel"></i>';
-          }
-          
-          e.target.appendChild(newStrip);
-          incrementMoveCount();
-          checkWin(); // Auto-check after each move
-        }
-        
-        if (currentDraggedElement) {
-          currentDraggedElement.classList.remove('pulse');
-          currentDraggedElement = null;
-        }
-      }
-      
-      // Touch events for mobile
-      let touchStartX, touchStartY;
-      let draggedStrip = null;
-      
-      function stripTouchStart(e) {
-        const touch = e.touches[0];
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
-        
-        draggedStrip = e.target.cloneNode(true);
-        draggedStrip.style.position = 'fixed';
-        draggedStrip.style.zIndex = '1000';
-        draggedStrip.style.width = e.target.offsetWidth + 'px';
-        draggedStrip.style.height = e.target.offsetHeight + 'px';
-        draggedStrip.style.left = (touch.pageX - draggedStrip.offsetWidth / 2) + 'px';
-        draggedStrip.style.top = (touch.pageY - draggedStrip.offsetHeight / 2) + 'px';
-        document.body.appendChild(draggedStrip);
-        
-        e.target.classList.add('pulse');
-        e.preventDefault();
-      }
-      
-      function stripTouchMove(e) {
-        if (!draggedStrip) return;
-        const touch = e.touches[0];
-        draggedStrip.style.left = (touch.pageX - draggedStrip.offsetWidth / 2) + 'px';
-        draggedStrip.style.top = (touch.pageY - draggedStrip.offsetHeight / 2) + 'px';
-        
-        // Highlight potential drop target
-        const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
-        const cell = elements.find(el => el.classList.contains('cell'));
-        
-        document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight'));
-        if (cell && !cell.hasChildNodes()) {
-          cell.classList.add('highlight');
-        }
-        
-        e.preventDefault();
-      }
-      
-      function stripTouchEnd(e) {
-        if (!draggedStrip) return;
-        
-        const touch = e.changedTouches[0];
-        const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
-        const cell = elements.find(el => el.classList.contains('cell'));
-        
-        if (cell && !cell.hasChildNodes()) {
-          const color = draggedStrip.classList.contains("green") ? "green" : "white";
-          const newStrip = document.createElement("div");
-          newStrip.classList.add("strip", color);
-          
-          if (color === "green") {
-            newStrip.innerHTML = '<i class="fas fa-leaf"></i>';
-          } else {
-            newStrip.innerHTML = '<i class="fas fa-stroopwafel"></i>';
-          }
-          
-          cell.appendChild(newStrip);
-          incrementMoveCount();
-          checkWin(); // Auto-check after each move
-        }
-        
-        document.body.removeChild(draggedStrip);
-        draggedStrip = null;
-        
-        // Remove pulse animation and highlight
-        document.querySelectorAll('.draggable-strip').forEach(s => s.classList.remove('pulse'));
-        document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight'));
-        
-        e.preventDefault();
-      }
-      
-      function cellTouchStart(e) {
-        // Prevent default to prevent scrolling
-        e.preventDefault();
-      }
-      
-      function cellTouchMove(e) {
-        // Prevent default to prevent scrolling
-        e.preventDefault();
-      }
-      
-      function cellTouchEnd(e) {
-        // Prevent default to prevent scrolling
-        e.preventDefault();
-      }
-      
-      // Game functions
-      function incrementMoveCount() {
-        moveCount++;
-        moveCountElement.textContent = moveCount;
-      }
-      
-      function checkWin() {
-        const cells = document.querySelectorAll("#gameArea .cell");
-        
-        // Check if all cells are filled
-        const allFilled = [...cells].every(cell => cell.hasChildNodes());
-        if (!allFilled) return;
-        
-        let correct = true;
-        cells.forEach((cell, i) => {
-          const expectedColor = (Math.floor(i / 3) + i % 3) % 2 === 0 ? "green" : "white";
-          const actualColor = cell.firstChild.classList.contains("green") ? "green" : "white";
-          
-          if (actualColor !== expectedColor) {
-            correct = false;
-          }
-        });
-        
-        if (correct) {
-          showMessage("✅ Well done! You've woven a perfect ketupat!", "success");
-          gameCompleted = true;
-          
-          // Celebration animation
-          cells.forEach(cell => {
-            cell.firstChild.classList.add("celebrate");
-          });
-        } else {
-          showMessage("❌ Not quite right. Keep trying!", "error");
-        }
-      }
-      
-      function showMessage(text, type) {
-        message.textContent = text;
-        message.classList.add("show", type);
-        
-        // Auto-hide message after 3 seconds
-        setTimeout(() => {
-          message.classList.remove("show");
-        }, 3000);
-      }
-      
-      function resetGame() {
-        initGame();
-      }
-      
-      // Share functions
-      document.getElementById('whatsapp-share').addEventListener('click', function() {
-        const text = "Check out this fun Ketupat Weaving Game!";
-        const url = window.location.href;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
-      });
-      
-      document.getElementById('telegram-share').addEventListener('click', function() {
-        const text = "Check out this fun Ketupat Weaving Game!";
-        const url = window.location.href;
-        window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
-      });
-      
-      document.getElementById('copy-link').addEventListener('click', function() {
-        const url = window.location.href;
-        navigator.clipboard.writeText(url).then(() => {
-          alert('Link copied to clipboard!');
-        });
-      });
-      
-      // Event listeners
-      checkBtn.addEventListener("click", checkWin);
-      resetBtn.addEventListener("click", resetGame);
-      
-      // Initialize the game
-      initGame();
-    });
-  </script>
+    </script>
 </body>
 </html>
